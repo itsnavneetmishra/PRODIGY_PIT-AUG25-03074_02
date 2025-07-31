@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dark Tic-Tac-Toe</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #8a2be2, #00bfff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
+    }
+
+    .cell:hover {
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .cell.x {
+      color: #00bfff; /* Electric Blue */
+      text-shadow: 0 0 8px #00bfff;
+    }
+
+    .cell.o {
+      color: #ff69b4; /* Vibrant Pink */
+      text-shadow: 0 0 8px #ff69b4;
+    }
+
+    .status {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #ccc;
+    }
+
+    .reset {
+      padding: 10px 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #8a2be2, #00bfff);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0, 191, 255, 0.4);
+      transition: 0.3s;
+    }
+
+    .reset:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #ff69b4, #8a2be2);
+      box-shadow: 0 0 25px rgba(255, 105, 180, 0.5);
+    }
+
+    @media (max-width: 500px) {
+      .board {
+        grid-template-columns: repeat(3, 80px);
+        gap: 10px;
+      }
+
+      .cell {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Dark Mode Tic-Tac-Toe</h1>
+  <div class="board" id="board"></div>
+  <div class="status" id="status"></div>
+  <button class="reset" onclick="resetGame()">Restart Game</button>
+
+  <script>
+    const board = document.getElementById('board');
+    const status = document.getElementById('status');
+    let currentPlayer = 'X';
+    let gameState = Array(9).fill('');
+    let gameActive = true;
+
+    const winningCombinations = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    function handleCellClick(e) {
+      const cell = e.target;
+      const index = cell.getAttribute('data-index');
+
+      if (gameState[index] !== '' || !gameActive) return;
+
+      gameState[index] = currentPlayer;
+      cell.textContent = currentPlayer;
+      cell.classList.add(currentPlayer.toLowerCase());
+
+      if (checkWin()) {
+        status.textContent = `🎉 Player ${currentPlayer} wins!`;
+        gameActive = false;
+        return;
+      }
+
+      if (gameState.every(cell => cell !== '')) {
+        status.textContent = `😐 It's a draw!`;
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      status.textContent = `Player ${currentPlayer}'s turn`;
+    }
+
+    function checkWin() {
+      return winningCombinations.some(combination =>
+        combination.every(index => gameState[index] === currentPlayer)
+      );
+    }
+
+    function resetGame() {
+      gameState = Array(9).fill('');
+      currentPlayer = 'X';
+      gameActive = true;
+      status.textContent = `Player ${currentPlayer}'s turn`;
+      document.querySelectorAll('.cell').forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('x', 'o');
+      });
+    }
+
+    function createBoard() {
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.setAttribute('data-index', i);
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
+      }
+      status.textContent = `Player ${currentPlayer}'s turn`;
+    }
+
+    createBoard();
+  </script>
+
+</body>
+</html>
